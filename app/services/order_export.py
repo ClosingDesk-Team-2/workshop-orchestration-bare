@@ -8,7 +8,7 @@ class Order:
 
 def export_orders(session, owner_id: int):
     """Return every order this owner is allowed to export."""
-    return session.query(Order).filter(Order.owner_id == owner_id).limit(20).all()
+    return session.query(Order).filter(Order.owner_id == owner_id).all()
 
 
 def cancel_order(session, order, actor_id: int):
