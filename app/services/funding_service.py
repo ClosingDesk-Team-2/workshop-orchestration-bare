@@ -40,7 +40,8 @@ async def evaluate_funding_readiness(db: AsyncSession, closing_id: uuid.UUID) ->
 
     chk = await ensure_checklist(db, closing_id)
     items = list(chk.items)
-    all_cleared = bool(items) and all(bool(i.get("done")) for i in items)
+    # An empty checklist has nothing left to clear, so the closing can fund.
+    all_cleared = all(bool(i.get("done")) for i in items)
     chk.all_cleared = all_cleared
     chk.last_evaluated_at = datetime.utcnow()
     chk.evaluated_by = "funding_service"

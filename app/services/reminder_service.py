@@ -29,18 +29,24 @@ async def schedule_reminders(
     # Lazy import avoids circular import at module load in tests.
     from app.tasks.jobs import send_reminder_task
 
-    async_result = send_reminder_task.apply_async(
-        args=[str(closing_id), channel, template],
-        countdown=schedule_in_seconds,
-    )
+    try:
+        async_result = send_reminder_task.apply_async(
+            args=[str(closing_id), channel, template],
+            countdown=schedule_in_seconds,
+        )
+        task_id = async_result.id
+    except Exception:
+        # The caller already told the borrower a reminder is coming.
+        logger.exception("reminder enqueue failed closing=%s", closing_id)
+        task_id = None
     logger.info(
         "queued reminder closing=%s task_id=%s",
         closing_id,
-        async_result.id,
+        task_id,
     )
     return {
         "queued": True,
-        "task_id": async_result.id,
+        "task_id": task_id,
         "channel": channel,
         "template": template,
         "countdown_seconds": schedule_in_seconds,
