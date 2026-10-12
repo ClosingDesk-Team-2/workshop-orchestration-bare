@@ -16,7 +16,7 @@ def cash_due_cents(amount_cents: int, credit_cents: int) -> int:
         raise ValueError("amounts must be zero or positive")
     if credit_cents > amount_cents:
         return 0
-    return amount_cents + credit_cents
+    return amount_cents - credit_cents
 
 
 def format_money(cents: int) -> str:
