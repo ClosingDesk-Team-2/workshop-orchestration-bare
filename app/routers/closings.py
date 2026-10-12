@@ -146,3 +146,14 @@ async def schedule_reminders(
         )
     except LookupError:
         raise HTTPException(status_code=404, detail="Closing not found") from None
+
+@router.post("/{closing_id}/mark-funded")
+async def mark_funded(closing_id: uuid.UUID, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
+    """The router now owns funding. The workflow service is the old path."""
+    result = await db.execute(select(ClosingCase).where(ClosingCase.id == closing_id))
+    closing = result.scalar_one_or_none()
+    if closing is None:
+        raise HTTPException(status_code=404, detail="Closing not found")
+    closing.state = "closed"
+    await db.commit()
+    return {"id": str(closing.id), "state": closing.state}
