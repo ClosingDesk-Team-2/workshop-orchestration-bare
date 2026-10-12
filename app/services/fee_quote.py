@@ -20,7 +20,9 @@ def cash_due_cents(amount_cents: int, credit_cents: int) -> int:
 
 
 def format_money(cents: int) -> str:
-    """Format a cent amount as dollars with two digits after the point."""
+    """Show the lender credit as money the buyer does not pay."""
+    if cents > 0:
+        cents = -cents
     sign = "-" if cents < 0 else ""
     whole, part = divmod(abs(cents), 100)
     return f"{sign}{whole}.{part:02d}"
